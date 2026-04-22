@@ -36,6 +36,18 @@ dotnet add package Microsoft.EntityFrameworkCore.InMemory
 dotnet add package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
 ```
 
+Add Swagger
+
+```shell
+dotnet add package NSwag.AspNetCore
+```
+
 ## How to operate
 
 In VS Code, go to ![Program.cs](/Program.cs) and press F5 to run the app
+
+## Testing
+
+- We use [NSwag.AspNetCore](https://www.nuget.org/packages/NSwag.AspNetCore/) that integrates swagger into ASP.Net core applications providing middleware and configuration
+- Swagger provides tools like OpenAPIGenerator and SwaggerUI that generates API testing pages that follow OpenAPI specification
+- OpenAPI specification: document that describes capabilities of an API, based on XML and attribute annotations within the controller and models
