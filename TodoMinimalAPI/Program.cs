@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+// Adds database context to dependency injection (DI)
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
+// Enables displaying database related exceptions
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 
