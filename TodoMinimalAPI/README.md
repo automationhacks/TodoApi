@@ -1,3 +1,7 @@
+# TodoMinimalAPI
+
+This repo shows how you can build quick simple APIs using ASP.NET Core
+
 Follows [this](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&tabs=visual-studio-code) tutorial
 
 ## Setup
@@ -23,6 +27,13 @@ Trusting the HTTPS development certificate was requested. If the certificate is 
 This command might prompt you for your password to install the certificate on the keychain. To undo these changes: 'security remove-trusted-cert <<certificate>>'
 
 Successfully trusted the existing HTTPS certificate.
+```
+
+Include Nuget packages to support database and diagnostics
+
+```shell
+dotnet add package Microsoft.EntityFrameworkCore.InMemory
+dotnet add package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
 ```
 
 ## How to operate
