@@ -84,4 +84,21 @@ app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
     return Results.NotFound();
 });
 
+// Json patch could be used to apply partial changes to a JSON
+// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
+app.MapPatch("/todoitems/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
+{
+    var todo = await db.Todos.FindAsync(id);
+
+    if (todo is null) return Results.NotFound();
+
+    if (inputTodo.Name is not null) todo.Name = inputTodo.Name;
+    // If you've already checked that a parameter is not null, you can use .Value
+    // to get the value without getting a build error
+    if (inputTodo.IsComplete is not null) todo.IsComplete = inputTodo.IsComplete.Value;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
 app.Run();
