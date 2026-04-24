@@ -35,18 +35,19 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+var todoItems = app.MapGroup("/todoitems");
 // Get all todos
-app.MapGet("/todoitems", async (TodoDb db) => await db.Todos.ToListAsync());
+todoItems.MapGet("/", async (TodoDb db) => await db.Todos.ToListAsync());
 
 // Get all completed todos
-app.MapGet("/todoitems/complete", async (TodoDb db) => await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
+todoItems.MapGet("/complete", async (TodoDb db) => await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
 
 // Get todo by id
-app.MapGet("/todoitems/{id}",
+todoItems.MapGet("/{id}",
     async (int id, TodoDb db) => await db.Todos.FindAsync(id) is Todo todo ? Results.Ok(todo) : Results.NotFound());
 
 // Create todo
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
+todoItems.MapPost("/", async (Todo todo, TodoDb db) =>
 {
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
@@ -55,7 +56,7 @@ app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
 });
 
 // Update todo
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
+todoItems.MapPut("/{id}", async (int id, Todo inputTodo, TodoDb db) =>
 {
     var todo = await db.Todos.FindAsync(id);
 
@@ -72,7 +73,7 @@ app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
 });
 
 // Remove a todo from in memory db
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
+todoItems.MapDelete("/{id}", async (int id, TodoDb db) =>
 {
     if (await db.Todos.FindAsync(id) is Todo todo)
     {
@@ -86,7 +87,7 @@ app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
 
 // Json patch could be used to apply partial changes to a JSON
 // https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
-app.MapPatch("/todoitems/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
+todoItems.MapPatch("/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
 {
     var todo = await db.Todos.FindAsync(id);
 
