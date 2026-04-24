@@ -37,14 +37,20 @@ if (app.Environment.IsDevelopment())
 
 var todoItems = app.MapGroup("/todoitems");
 // Get all todos
-todoItems.MapGet("/", async (TodoDb db) => await db.Todos.ToListAsync());
+todoItems.MapGet("/", GetAllTodos);
+
+app.Run();
+
+static async Task<IResult> GetAllTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.ToListAsync());
+}
 
 // Get all completed todos
-todoItems.MapGet("/complete", async (TodoDb db) => await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
+todoItems.MapGet("/complete", GetCompleteTodos);
 
 // Get todo by id
-todoItems.MapGet("/{id}",
-    async (int id, TodoDb db) => await db.Todos.FindAsync(id) is Todo todo ? Results.Ok(todo) : Results.NotFound());
+todoItems.MapGet("/{id}", GetTodo);
 
 // Create todo
 todoItems.MapPost("/", async (Todo todo, TodoDb db) =>
@@ -102,4 +108,13 @@ todoItems.MapPatch("/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
     return Results.NoContent();
 });
 
-app.Run();
+static async Task<IResult> GetCompleteTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
+}
+
+static async Task<IResult> GetTodo(int id, TodoDb db)
+{
+    return await db.Todos.FindAsync(id) is Todo todo
+        ? TypedResults.Ok(todo) : TypedResults.NotFound();
+}
