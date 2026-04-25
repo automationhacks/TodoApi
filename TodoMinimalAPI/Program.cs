@@ -39,21 +39,14 @@ var todoItems = app.MapGroup("/todoitems");
 // Get all todos
 todoItems.MapGet("/", GetAllTodos);
 
-app.Run();
-
-static async Task<IResult> GetAllTodos(TodoDb db)
-{
-    return TypedResults.Ok(await db.Todos.ToListAsync());
-}
+// Create todo
+todoItems.MapPost("/", CreateTodo);
 
 // Get all completed todos
 todoItems.MapGet("/complete", GetCompleteTodos);
 
 // Get todo by id
 todoItems.MapGet("/{id}", GetTodo);
-
-// Create todo
-todoItems.MapPost("/", CreateTodo);
 
 // Update todo
 todoItems.MapPut("/{id}", UpdateTodo);
@@ -64,6 +57,13 @@ todoItems.MapDelete("/{id}", DeleteTodo);
 // Json patch could be used to apply partial changes to a JSON
 // https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
 todoItems.MapPatch("/{id}", PartialUpdateTodo);
+
+app.Run();
+
+static async Task<IResult> GetAllTodos(TodoDb db)
+{
+    return TypedResults.Ok(await db.Todos.ToListAsync());
+}
 
 static async Task<IResult> GetCompleteTodos(TodoDb db)
 {
