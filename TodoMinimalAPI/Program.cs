@@ -62,7 +62,7 @@ app.Run();
 
 static async Task<IResult> GetAllTodos(TodoDb db)
 {
-    return TypedResults.Ok(await db.Todos.ToListAsync());
+    return TypedResults.Ok(await db.Todos.Select(x => new TodoItemDto(x)).ToArrayAsync());
 }
 
 static async Task<IResult> GetCompleteTodos(TodoDb db)
@@ -72,34 +72,45 @@ static async Task<IResult> GetCompleteTodos(TodoDb db)
     // Automatically returns response type metadata for OpenAPI to describe the endpoint
     // Read https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0#typedresults-vs-results
     // to understand benefits of TypedResults over Results
-    return TypedResults.Ok(await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
+    return TypedResults
+        .Ok(await db.Todos.Where(todo => todo.IsComplete)
+            .Select(x => new TodoItemDto(x)).ToListAsync());
 }
 
 static async Task<IResult> GetTodo(int id, TodoDb db)
 {
-    return await db.Todos.FindAsync(id) is Todo todo
-        ? TypedResults.Ok(todo) : TypedResults.NotFound();
+    var todo = await db.Todos.FindAsync(id);
+    return todo != null
+        ? TypedResults.Ok(new TodoItemDto(todo))
+        : TypedResults.NotFound();
 }
 
-static async Task<IResult> CreateTodo(Todo todo, TodoDb db)
+static async Task<IResult> CreateTodo(TodoItemDto todoItemDto, TodoDb db)
 {
-    db.Todos.Add(todo);
+    var todoItem = new Todo
+        {
+            IsComplete = todoItemDto.IsComplete,
+            Name = todoItemDto.Name
+        }
+        ;
+
+    db.Todos.Add(todoItem);
     await db.SaveChangesAsync();
 
-    return TypedResults.Created($"/todoitems/{todo.Id}", todo);
+    return TypedResults.Created($"/todoitems/{todoItemDto.Id}", todoItemDto);
 }
 
-static async Task<IResult> UpdateTodo(int id, Todo inputTodo, TodoDb db)
+static async Task<IResult> UpdateTodo(int id, TodoItemDto todoItemDto, TodoDb db)
 {
     var todo = await db.Todos.FindAsync(id);
 
     if (todo is null)
     {
-        return Results.NotFound();
+        return TypedResults.NotFound();
     }
 
-    todo.Name = inputTodo.Name;
-    todo.IsComplete = inputTodo.IsComplete;
+    todo.Name = todoItemDto.Name;
+    todo.IsComplete = todoItemDto.IsComplete;
 
     await db.SaveChangesAsync();
     return TypedResults.NoContent();
@@ -107,7 +118,16 @@ static async Task<IResult> UpdateTodo(int id, Todo inputTodo, TodoDb db)
 
 static async Task<IResult> DeleteTodo(int id, TodoDb db)
 {
-    if (await db.Todos.FindAsync(id) is Todo todo)
+    // is { } todo is a null check pattern
+    // it checks if result is a non null object, assign it to todo
+    // { } matches any non null object
+    // this code is equivalent to:
+    // var todo = await db.Todos.FindAsync(id);
+    // if (todo != null)
+    // {
+    //     ...
+    // }
+    if (await db.Todos.FindAsync(id) is { } todo)
     {
         db.Todos.Remove(todo);
         await db.SaveChangesAsync();
