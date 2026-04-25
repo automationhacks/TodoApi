@@ -53,16 +53,43 @@ todoItems.MapGet("/complete", GetCompleteTodos);
 todoItems.MapGet("/{id}", GetTodo);
 
 // Create todo
-todoItems.MapPost("/", async (Todo todo, TodoDb db) =>
+todoItems.MapPost("/", CreateTodo);
+
+// Update todo
+todoItems.MapPut("/{id}", UpdateTodo);
+
+// Remove a todo from in memory db
+todoItems.MapDelete("/{id}", DeleteTodo);
+
+// Json patch could be used to apply partial changes to a JSON
+// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
+todoItems.MapPatch("/{id}", PartialUpdateTodo);
+
+static async Task<IResult> GetCompleteTodos(TodoDb db)
+{
+    // TypedResults is better than return Results as
+    // It enables testability
+    // Automatically returns response type metadata for OpenAPI to describe the endpoint
+    // Read https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/responses?view=aspnetcore-10.0#typedresults-vs-results
+    // to understand benefits of TypedResults over Results
+    return TypedResults.Ok(await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
+}
+
+static async Task<IResult> GetTodo(int id, TodoDb db)
+{
+    return await db.Todos.FindAsync(id) is Todo todo
+        ? TypedResults.Ok(todo) : TypedResults.NotFound();
+}
+
+static async Task<IResult> CreateTodo(Todo todo, TodoDb db)
 {
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
 
-    return Results.Created($"/todoitems/{todo.Id}", todo);
-});
+    return TypedResults.Created($"/todoitems/{todo.Id}", todo);
+}
 
-// Update todo
-todoItems.MapPut("/{id}", async (int id, Todo inputTodo, TodoDb db) =>
+static async Task<IResult> UpdateTodo(int id, Todo inputTodo, TodoDb db)
 {
     var todo = await db.Todos.FindAsync(id);
 
@@ -75,29 +102,26 @@ todoItems.MapPut("/{id}", async (int id, Todo inputTodo, TodoDb db) =>
     todo.IsComplete = inputTodo.IsComplete;
 
     await db.SaveChangesAsync();
-    return Results.NoContent();
-});
+    return TypedResults.NoContent();
+}
 
-// Remove a todo from in memory db
-todoItems.MapDelete("/{id}", async (int id, TodoDb db) =>
+static async Task<IResult> DeleteTodo(int id, TodoDb db)
 {
     if (await db.Todos.FindAsync(id) is Todo todo)
     {
         db.Todos.Remove(todo);
         await db.SaveChangesAsync();
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 
-    return Results.NotFound();
-});
+    return TypedResults.NotFound();
+}
 
-// Json patch could be used to apply partial changes to a JSON
-// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
-todoItems.MapPatch("/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
+static async Task<IResult> PartialUpdateTodo(int id, TodoPatchDto inputTodo, TodoDb db)
 {
     var todo = await db.Todos.FindAsync(id);
 
-    if (todo is null) return Results.NotFound();
+    if (todo is null) return TypedResults.NotFound();
 
     if (inputTodo.Name is not null) todo.Name = inputTodo.Name;
     // If you've already checked that a parameter is not null, you can use .Value
@@ -105,16 +129,5 @@ todoItems.MapPatch("/{id}", async (int id, TodoPatchDto inputTodo, TodoDb db) =>
     if (inputTodo.IsComplete is not null) todo.IsComplete = inputTodo.IsComplete.Value;
 
     await db.SaveChangesAsync();
-    return Results.NoContent();
-});
-
-static async Task<IResult> GetCompleteTodos(TodoDb db)
-{
-    return TypedResults.Ok(await db.Todos.Where(todo => todo.IsComplete).ToListAsync());
-}
-
-static async Task<IResult> GetTodo(int id, TodoDb db)
-{
-    return await db.Todos.FindAsync(id) is Todo todo
-        ? TypedResults.Ok(todo) : TypedResults.NotFound();
+    return TypedResults.NoContent();
 }
