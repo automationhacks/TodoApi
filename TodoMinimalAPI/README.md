@@ -66,7 +66,7 @@ dotnet run DeveloperExceptionPage.cs
 
 ## Deployment
 
-Using Azure extension, select `Azure app service: Deploy to web app` to publish the API. Follow the steps [here](https://learn.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net10&pivots=development-environment-vscode) to deploy your application to Azure app service
+Using [Azure tools extension](https://code.visualstudio.com/docs/azure/gettingstarted) in VSCodeb, select `Azure app service: Deploy to web app` to publish the API. Follow the steps [here](https://learn.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net10&pivots=development-environment-vscode) to deploy your application to Azure app service
 
 Get todo
 
@@ -84,4 +84,4 @@ curl -i -X POST "https://todominimalapi-dpduh6fvbnhtbac7.southindia-01.azurewebs
 
 ## Monitoring
 
-You can see app service logs by clicking on **Log stream** in portal.azure.com
+You can see app serv
