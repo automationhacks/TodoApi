@@ -2,9 +2,14 @@
 // Go to /exception to see Developer exception page
 // Otherwise keep this commented as there can only be one top level unit in the application
 
-// var builder = WebApplication.CreateBuilder(args);
-// var app = builder.Build();
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
 
-// app.MapGet("/exception", () => { throw new InvalidOperationException("Sample exception"); });
-// app.MapGet("/", () => "Test by calling /exception");
-// app.Run();
+// In production env, we should use UseExceptionHandler that provides
+// RFC 7807 compliant payload to the client
+app.UseExceptionHandler(exceptionHandlerApp =>
+    exceptionHandlerApp.Run(async context => await Results.Problem().ExecuteAsync(context)));
+
+app.MapGet("/exception", () => { throw new InvalidOperationException("Sample exception"); });
+app.MapGet("/", () => "Test by calling /exception");
+app.Run();
