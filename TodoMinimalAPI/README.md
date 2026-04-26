@@ -63,3 +63,25 @@ dotnet run DeveloperExceptionPage.cs
 - We use [NSwag.AspNetCore](https://www.nuget.org/packages/NSwag.AspNetCore/) that integrates swagger into ASP.Net core applications providing middleware and configuration
 - Swagger provides tools like OpenAPIGenerator and SwaggerUI that generates API testing pages that follow OpenAPI specification
 - OpenAPI specification: document that describes capabilities of an API, based on XML and attribute annotations within the controller and models
+
+## Deployment
+
+Using Azure extension, select `Azure app service: Deploy to web app` to publish the API. Follow the steps [here](https://learn.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore?tabs=net10&pivots=development-environment-vscode) to deploy your application to Azure app service
+
+Get todo
+
+```shell
+curl -i -X GET "https://todominimalapi-dpduh6fvbnhtbac7.southindia-01.azurewebsites.net/todoitems"
+```
+
+Create todo
+
+```shell
+curl -i -X POST "https://todominimalapi-dpduh6fvbnhtbac7.southindia-01.azurewebsites.net/todoitems" \
+     -H "Content-Type: application/json" \
+     -d "{\"name\":\"finish azure tutorial\",\"isComplete\":false}"
+```
+
+## Monitoring
+
+You can see app service logs by clicking on **Log stream** in portal.azure.com
