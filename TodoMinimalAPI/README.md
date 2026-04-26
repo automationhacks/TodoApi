@@ -84,4 +84,4 @@ curl -i -X POST "https://todominimalapi-dpduh6fvbnhtbac7.southindia-01.azurewebs
 
 ## Monitoring
 
-You can see app serv
+You can see app service logs by clicking on **Log stream** in portal.azure.com
