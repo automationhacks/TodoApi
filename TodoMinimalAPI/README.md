@@ -46,6 +46,18 @@ dotnet add package NSwag.AspNetCore
 
 In VS Code, go to ![Program.cs](/Program.cs) and press F5 to run the app
 
+You can run the application by
+
+```shell
+dotnet run
+```
+
+In case you have a specific file you want to run that has the service initialization code
+
+```shell
+dotnet run DeveloperExceptionPage.cs
+```
+
 ## Testing
 
 - We use [NSwag.AspNetCore](https://www.nuget.org/packages/NSwag.AspNetCore/) that integrates swagger into ASP.Net core applications providing middleware and configuration
