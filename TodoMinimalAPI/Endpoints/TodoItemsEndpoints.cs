@@ -8,26 +8,26 @@ public static class TodoItemsEndpoints
     public static void RegisterTodoItemsEndpoints(this WebApplication app)
     {
         var todoItems = app.MapGroup("/todoitems");
-// Get all todos
+        // Get all todos
         todoItems.MapGet("/", GetAllTodos);
 
-// Create todo
+        // Create todo
         todoItems.MapPost("/", CreateTodo);
 
-// Get all completed todos
+        // Get all completed todos
         todoItems.MapGet("/complete", GetCompleteTodos);
 
-// Get todo by id
+        // Get todo by id
         todoItems.MapGet("/{id}", GetTodo);
 
-// Update todo
+        // Update todo
         todoItems.MapPut("/{id}", UpdateTodo);
 
-// Remove a todo from in memory db
+        // Remove a todo from in memory db
         todoItems.MapDelete("/{id}", DeleteTodo);
 
-// Json patch could be used to apply partial changes to a JSON
-// https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
+        // Json patch could be used to apply partial changes to a JSON
+        // https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-10.0
         todoItems.MapPatch("/{id}", PartialUpdateTodo);
     }
 
