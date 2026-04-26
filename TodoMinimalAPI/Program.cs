@@ -1,6 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.WriteIndented = true;
+    options.SerializerOptions.IncludeFields = true;
+});
+
 // Adds database context to dependency injection (DI)
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 // Enables displaying database related exceptions
@@ -20,11 +27,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    /**
-    Enables swagger middleware for serving generated JSON doc and Swagger UI
-    It is only enabled in development environment
-    Exposing in production could expose sensitive details about API structure and implementation
-    **/
+    // Enables swagger middleware for serving generated JSON doc and Swagger UI
+    // It is only enabled in development environment
+    // Exposing in production could expose sensitive details about API structure and implementation
     app.UseOpenApi();
     app.UseSwaggerUi(config =>
     {
