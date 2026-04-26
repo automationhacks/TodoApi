@@ -15,9 +15,24 @@ var app = builder.Build();
 app.UseExceptionHandler(exceptionHandlerApp =>
     exceptionHandlerApp.Run(async context => await Results.Problem().ExecuteAsync(context)));
 // Generates a problem details response by default
-app.UseStatusCodePages(async statusCodeContext =>
-    await Results.Problem(statusCode: statusCodeContext.HttpContext.Response.StatusCode)
-        .ExecuteAsync(statusCodeContext.HttpContext));
+// You can specify a fallback in case IProblemDetailsService implementation is not able to
+// generate a response
+// to test this:
+//      dotnet run DeveloperExceptionPage.cs
+//      curl -i -H "Accept: application/xml" http://localhost:5152/users/-1
+
+app.UseStatusCodePages(statusCodeHandlerApp =>
+{
+    statusCodeHandlerApp.Run(async httpContext =>
+    {
+        var pds = httpContext.RequestServices.GetService<IProblemDetailsService>();
+        if (pds == null || !await pds.TryWriteAsync(new() { HttpContext = httpContext }))
+        {
+            // Fallback behavior
+            await httpContext.Response.WriteAsync("Fallback: An error occured");
+        }
+    });
+});
 
 app.MapGet("/exception", () => { throw new InvalidOperationException("Sample exception"); });
 app.MapGet("/", () => "Test by calling /exception");
