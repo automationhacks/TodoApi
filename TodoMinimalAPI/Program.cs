@@ -4,7 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
+    // Formats JSON
     options.SerializerOptions.WriteIndented = true;
+    // Includes public fields
     options.SerializerOptions.IncludeFields = true;
 });
 
